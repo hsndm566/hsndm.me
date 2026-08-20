@@ -1,4 +1,5 @@
 // Design: Field Manual Modernism — personal proof is arranged as a technical evidence book with warm editorial space and measured motion.
+import { animate, stagger } from "animejs";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowDownRight,
@@ -51,6 +52,16 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const closeMenu = () => setMenuOpen(false);
+  const playInspectionTrace = (event: React.MouseEvent<HTMLElement>) => {
+    if (shouldReduceMotion) return;
+    animate(event.currentTarget.querySelectorAll("[data-inspection-trace]"), {
+      opacity: [0.22, 1],
+      scaleX: [0, 1],
+      delay: stagger(78),
+      duration: 680,
+      ease: "outExpo",
+    });
+  };
 
   return (
     <div className="site-shell">
@@ -66,15 +77,16 @@ export default function Home() {
 
           <div className={`nav__links ${menuOpen ? "nav__links--open" : ""}`}>
             <NavLink href="#work" onClick={closeMenu}>Work</NavLink>
+            <NavLink href="#automation-cases" onClick={closeMenu}>Cases</NavLink>
             <NavLink href="#method" onClick={closeMenu}>Method</NavLink>
             <NavLink href="#background" onClick={closeMenu}>Background</NavLink>
             <NavLink href="#contact" onClick={closeMenu}>Contact</NavLink>
-            <a href="mailto:hasanadam506@gmail.com?subject=Automation%20project%20enquiry" className="button button--oxide" onClick={closeMenu}>
+            <a href="#contact" className="button button--oxide" onClick={closeMenu}>
               <span className="button-label">Bring a bottleneck</span><ArrowUpRight size={15} aria-hidden="true" />
             </a>
           </div>
 
-          <a href="mailto:hasanadam506@gmail.com?subject=Automation%20project%20enquiry" className="button button--ink">
+          <a href="#contact" className="button button--ink">
             <span className="button-label">Start a conversation</span><ArrowUpRight size={15} aria-hidden="true" />
           </a>
 
@@ -220,6 +232,73 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="section case-files section--line" id="automation-cases" aria-labelledby="automation-cases-title">
+          <div className="page-frame">
+            <Reveal>
+              <div className="case-files__heading">
+                <div>
+                  <InspectionMark label="BUILD ARCHIVE / 02" />
+                  <div className="eyebrow eyebrow--blue">Automation case files</div>
+                  <h2 className="section-heading" id="automation-cases-title">Two systems, <em>made legible.</em></h2>
+                </div>
+                <p className="body-copy">These are personal build cases. They document the operating logic, not unverified customer outcomes.</p>
+              </div>
+            </Reveal>
+
+            <div className="case-files__grid">
+              <Reveal delay={0.05}>
+                <article className="build-case" onMouseEnter={playInspectionTrace}>
+                  <header className="build-case__header">
+                    <div><InspectionMark label="CASE / 02" /><span className="meta-label">Candidate workflow system</span></div>
+                    <span className="build-case__status">Personal build</span>
+                  </header>
+                  <div className="build-case__main">
+                    <div>
+                      <h3>AutoApply SA</h3>
+                      <p className="build-case__lede">A structured application-support concept designed to make a scattered candidate workflow easier to see, follow, and improve.</p>
+                    </div>
+                    <div className="build-case__facts">
+                      <div><span className="meta-label">The friction</span><p>Application steps, role fit, documents, and progress updates are often spread across disconnected tools and manual follow-ups.</p></div>
+                      <div><span className="meta-label">The system response</span><p>One intake path organizes candidate context, captures the next action, and returns a traceable status view instead of an opaque queue.</p></div>
+                    </div>
+                  </div>
+                  <div className="system-trace" aria-label="AutoApply SA operating sequence">
+                    <div data-inspection-trace><b>01</b><span>Candidate context</span></div>
+                    <div data-inspection-trace><b>02</b><span>Fit and document checks</span></div>
+                    <div data-inspection-trace><b>03</b><span>Clear status output</span></div>
+                  </div>
+                  <footer className="build-case__footer"><span><b>Demonstrates</b> Intake design, state visibility, and human-readable workflow hand-offs.</span><a href="https://github.com/hsndm566/autoapply-sa" target="_blank" rel="noreferrer">View repository <ArrowUpRight size={15} aria-hidden="true" /></a></footer>
+                </article>
+              </Reveal>
+
+              <Reveal delay={0.11}>
+                <article className="build-case build-case--dark" onMouseEnter={playInspectionTrace}>
+                  <header className="build-case__header">
+                    <div><InspectionMark label="CASE / 03" inverse /><span className="meta-label">Conversational service sandbox</span></div>
+                    <span className="build-case__status">Prototype logic</span>
+                  </header>
+                  <div className="build-case__main">
+                    <div>
+                      <h3>WhatsApp assistant</h3>
+                      <p className="build-case__lede">A configurable conversation-sandbox concept for testing how an AI assistant can qualify routine enquiries while preserving a clear human hand-off.</p>
+                    </div>
+                    <div className="build-case__facts">
+                      <div><span className="meta-label">The friction</span><p>Early enquiries can be repetitive, underspecified, and difficult to route consistently across service contexts.</p></div>
+                      <div><span className="meta-label">The system response</span><p>Industry-specific prompts, bounded answer paths, and escalation cues give visitors a useful first response without pretending to replace judgement.</p></div>
+                    </div>
+                  </div>
+                  <div className="system-trace" aria-label="WhatsApp assistant operating sequence">
+                    <div data-inspection-trace><b>01</b><span>Classify intent</span></div>
+                    <div data-inspection-trace><b>02</b><span>Apply safe prompt path</span></div>
+                    <div data-inspection-trace><b>03</b><span>Escalate with context</span></div>
+                  </div>
+                  <footer className="build-case__footer"><span><b>Demonstrates</b> Conversation design, industry configuration, and deliberate human escalation.</span><a href="#contact">Discuss a similar system <ArrowRight size={15} aria-hidden="true" /></a></footer>
+                </article>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
         <section className="section section--line" id="background" aria-labelledby="background-title">
           <div className="page-frame rail-layout">
             <aside className="rail" aria-label="Section marker">
@@ -247,13 +326,14 @@ export default function Home() {
               <InspectionMark label="OPEN FILE / HA" />
               <div className="eyebrow eyebrow--blue">Open file / start here</div>
               <h2 className="contact-title" id="contact-title">Have a manual process?<br /><em>Let’s inspect it.</em></h2>
+              <p className="contact-intro">The enquiry form below goes directly to Hasan’s project intake. Describe the work as it happens today—not as you wish it worked.</p>
             </Reveal>
             <Reveal delay={0.1}>
-              <aside className="contact-aside">
-                <div className="meta-label">The next step</div>
-                <p>Send the process that is wasting your team’s time. I’ll help make the work, the bottleneck, and the next system decision clear.</p>
-                <a className="button button--oxide" href="mailto:hasanadam506@gmail.com?subject=Automation%20project%20enquiry"><span className="button-label">Email Hasan</span><Mail size={15} aria-hidden="true" /></a>
-              </aside>
+              <div className="contact-form-wrap">
+                <div className="contact-form-wrap__top"><InspectionMark label="SECURE INTAKE / 01" /><span className="meta-label">Tally form · Direct enquiry</span></div>
+                <iframe className="contact-form" src="https://tally.so/r/D4RWJE?transparentBackground=1" title="Project enquiry form for Hasan Adam" loading="lazy" allow="clipboard-write" />
+                <div className="contact-form-wrap__fallback"><span>Prefer email?</span><a href="mailto:hasanadam506@gmail.com?subject=Automation%20project%20enquiry">hasanadam506@gmail.com <Mail size={14} aria-hidden="true" /></a></div>
+              </div>
             </Reveal>
           </div>
         </section>
