@@ -51,6 +51,7 @@ function InspectionMark({ label, inverse = false }: { label: string; inverse?: b
 function CountMetric({ target, prefix = "", suffix = "", decimals = 0 }: { target: number; prefix?: string; suffix?: string; decimals?: number }) {
   const valueRef = useRef<HTMLSpanElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [isCounting, setIsCounting] = useState(false);
 
   useEffect(() => {
     const node = valueRef.current;
@@ -66,12 +67,16 @@ function CountMetric({ target, prefix = "", suffix = "", decimals = 0 }: { targe
       if (!entry.isIntersecting) return;
       observer.disconnect();
       const counter = { value: 0 };
+      setIsCounting(true);
       animate(counter, {
         value: target,
         duration: 940,
         ease: "outExpo",
         onUpdate: () => { node.textContent = format(counter.value); },
-        onComplete: () => { node.textContent = format(target); },
+        onComplete: () => {
+          node.textContent = format(target);
+          setIsCounting(false);
+        },
       });
     }, { threshold: 0.55 });
 
@@ -79,7 +84,8 @@ function CountMetric({ target, prefix = "", suffix = "", decimals = 0 }: { targe
     return () => observer.disconnect();
   }, [decimals, prefix, shouldReduceMotion, suffix, target]);
 
-  return <span ref={valueRef}>{`${prefix}${target.toFixed(decimals)}${suffix}`}</span>;
+  const initialValue = `${prefix}${(shouldReduceMotion ? target : 0).toFixed(decimals)}${suffix}`;
+  return <span ref={valueRef} className={isCounting ? "metric-count metric-count--active" : "metric-count"}>{initialValue}</span>;
 }
 
 export default function Home() {
@@ -87,6 +93,34 @@ export default function Home() {
   const shouldReduceMotion = useReducedMotion();
   const heroRef = useRef<HTMLElement>(null);
   const closeMenu = () => setMenuOpen(false);
+  const runHeroBlueprintTrace = () => {
+    if (shouldReduceMotion || !heroRef.current) return;
+    const lines = heroRef.current.querySelectorAll("[data-blueprint-line='horizontal']");
+    const verticalLine = heroRef.current.querySelectorAll("[data-blueprint-line='vertical']");
+    const labels = heroRef.current.querySelectorAll("[data-blueprint-line='label']");
+
+    animate(lines, {
+      opacity: [0, 1],
+      scaleX: [0, 1],
+      delay: stagger(90, { start: 140 }),
+      duration: 720,
+      ease: "outExpo",
+    });
+    animate(verticalLine, {
+      opacity: [0, 1],
+      scaleY: [0, 1],
+      delay: 230,
+      duration: 760,
+      ease: "outExpo",
+    });
+    animate(labels, {
+      opacity: [0, 1],
+      translateY: [-5, 0],
+      delay: stagger(80, { start: 270 }),
+      duration: 520,
+      ease: "outExpo",
+    });
+  };
   const playInspectionTrace = (event: React.MouseEvent<HTMLElement>) => {
     if (shouldReduceMotion) return;
     animate(event.currentTarget.querySelectorAll("[data-inspection-trace]"), {
@@ -99,14 +133,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (shouldReduceMotion || !heroRef.current) return;
-    animate(heroRef.current.querySelectorAll("[data-blueprint-line]"), {
-      opacity: [0, 0.9],
-      scaleX: [0, 1],
-      delay: stagger(90, { start: 140 }),
-      duration: 720,
-      ease: "outExpo",
-    });
+    runHeroBlueprintTrace();
   }, [shouldReduceMotion]);
 
   return (
@@ -146,15 +173,22 @@ export default function Home() {
         <section className="hero" ref={heroRef} aria-labelledby="hero-title">
           <img className="hero__image" src={heroImage} alt="Engineering workbench with process sheets and calibrated tools" />
           <div className="hero__blueprint" aria-hidden="true">
-            <span className="hero__blueprint-line hero__blueprint-line--top" data-blueprint-line />
-            <span className="hero__blueprint-line hero__blueprint-line--vertical" data-blueprint-line />
-            <span className="hero__blueprint-line hero__blueprint-line--lower" data-blueprint-line />
-            <span className="hero__blueprint-mark hero__blueprint-mark--one" data-blueprint-line>HA / 001</span>
-            <span className="hero__blueprint-mark hero__blueprint-mark--two" data-blueprint-line>WORKFLOW AXIS</span>
+            <span className="hero__blueprint-line hero__blueprint-line--top" data-blueprint-line="horizontal" />
+            <span className="hero__blueprint-line hero__blueprint-line--vertical" data-blueprint-line="vertical" />
+            <span className="hero__blueprint-line hero__blueprint-line--lower" data-blueprint-line="horizontal" />
+            <span className="hero__blueprint-mark hero__blueprint-mark--one" data-blueprint-line="label">HA / 001</span>
+            <span className="hero__blueprint-mark hero__blueprint-mark--two" data-blueprint-line="label">WORKFLOW AXIS</span>
           </div>
           <div className="hero__grid page-frame">
             <Reveal className="hero__content">
-              <div className="eyebrow">Field note / 001</div>
+              <div className="hero__topline">
+                <div className="eyebrow">Field note / 001</div>
+                <button className="hero__trace-control" type="button" onClick={runHeroBlueprintTrace}>
+                  <span className="hero__trace-signal" aria-hidden="true" />
+                  <span>Replay blueprint trace</span>
+                  <span className="hero__trace-duration">0.72s</span>
+                </button>
+              </div>
               <h1 id="hero-title" className="hero__title">I build <span className="accent">systems</span><br />that move work<br />forward.</h1>
               <p className="hero__intro">Industrial engineer in Jeddah, trained to find operational friction—and build practical automation around it. Clear process. Useful tools. Measurable movement.</p>
               <div className="hero__actions">
@@ -174,6 +208,10 @@ export default function Home() {
                 <InspectionMark label="HA / ACTIVE" inverse /><span className="status-dot" aria-hidden="true" />
               </div>
               <p className="file-card__quote">“Bring me the bottleneck. I’ll map the work around it.”</p>
+              <div className="file-card__links" aria-label="Live portfolio systems">
+                <a href="https://status.hsndm.me">Service status <ArrowUpRight size={13} aria-hidden="true" /></a>
+                <a href="https://log.hsndm.me">Field log <ArrowUpRight size={13} aria-hidden="true" /></a>
+              </div>
               <div className="file-card__footer mono"><span>JEDDAH, SA</span><span>HA / 2026</span></div>
             </motion.aside>
           </div>
