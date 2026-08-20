@@ -1,0 +1,34 @@
+{
+  "posts": [
+    {
+      "slug": "launching-a-field-manual-portfolio",
+      "title": "Launching a field-manual portfolio",
+      "date": "2026-08-20",
+      "type": "Portfolio build",
+      "readTime": "3 min read",
+      "excerpt": "Why the site was designed as an evidence book for an operator-builder instead of a conventional creative portfolio.",
+      "file": "notes/launching-a-field-manual-portfolio.md",
+      "source": "https://github.com/hsndm566/hsndm.me/blob/main/notes/launching-a-field-manual-portfolio.md"
+    },
+    {
+      "slug": "making-contact-an-operating-system",
+      "title": "Making contact an operating system",
+      "date": "2026-08-20",
+      "type": "Workflow design",
+      "readTime": "2 min read",
+      "excerpt": "A project enquiry is more useful when it asks about the real bottleneck instead of collecting a generic message.",
+      "file": "notes/making-contact-an-operating-system.md",
+      "source": "https://github.com/hsndm566/hsndm.me/blob/main/notes/making-contact-an-operating-system.md"
+    },
+    {
+      "slug": "status-is-a-product-decision",
+      "title": "Status is a product decision",
+      "date": "2026-08-20",
+      "type": "Service design",
+      "readTime": "2 min read",
+      "excerpt": "A status page should state what is monitored, what is not, and how fresh each signal actually is.",
+      "file": "notes/status-is-a-product-decision.md",
+      "source": "https://github.com/hsndm566/hsndm.me/blob/main/notes/status-is-a-product-decision.md"
+    }
+  ]
+}
