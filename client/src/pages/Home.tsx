@@ -12,7 +12,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const heroImage = "/manus-storage/hasan-hero-workbench_511311f7.jpg";
 const processImage = "/manus-storage/hasan-process-study_7ded074f.jpg";
@@ -48,9 +48,44 @@ function InspectionMark({ label, inverse = false }: { label: string; inverse?: b
   );
 }
 
+function CountMetric({ target, prefix = "", suffix = "", decimals = 0 }: { target: number; prefix?: string; suffix?: string; decimals?: number }) {
+  const valueRef = useRef<HTMLSpanElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const node = valueRef.current;
+    if (!node) return;
+    const format = (value: number) => `${prefix}${value.toFixed(decimals)}${suffix}`;
+
+    if (shouldReduceMotion) {
+      node.textContent = format(target);
+      return;
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      const counter = { value: 0 };
+      animate(counter, {
+        value: target,
+        duration: 940,
+        ease: "outExpo",
+        onUpdate: () => { node.textContent = format(counter.value); },
+        onComplete: () => { node.textContent = format(target); },
+      });
+    }, { threshold: 0.55 });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [decimals, prefix, shouldReduceMotion, suffix, target]);
+
+  return <span ref={valueRef}>{`${prefix}${target.toFixed(decimals)}${suffix}`}</span>;
+}
+
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const heroRef = useRef<HTMLElement>(null);
   const closeMenu = () => setMenuOpen(false);
   const playInspectionTrace = (event: React.MouseEvent<HTMLElement>) => {
     if (shouldReduceMotion) return;
@@ -62,6 +97,17 @@ export default function Home() {
       ease: "outExpo",
     });
   };
+
+  useEffect(() => {
+    if (shouldReduceMotion || !heroRef.current) return;
+    animate(heroRef.current.querySelectorAll("[data-blueprint-line]"), {
+      opacity: [0, 0.9],
+      scaleX: [0, 1],
+      delay: stagger(90, { start: 140 }),
+      duration: 720,
+      ease: "outExpo",
+    });
+  }, [shouldReduceMotion]);
 
   return (
     <div className="site-shell">
@@ -97,8 +143,15 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="hero" aria-labelledby="hero-title">
+        <section className="hero" ref={heroRef} aria-labelledby="hero-title">
           <img className="hero__image" src={heroImage} alt="Engineering workbench with process sheets and calibrated tools" />
+          <div className="hero__blueprint" aria-hidden="true">
+            <span className="hero__blueprint-line hero__blueprint-line--top" data-blueprint-line />
+            <span className="hero__blueprint-line hero__blueprint-line--vertical" data-blueprint-line />
+            <span className="hero__blueprint-line hero__blueprint-line--lower" data-blueprint-line />
+            <span className="hero__blueprint-mark hero__blueprint-mark--one" data-blueprint-line>HA / 001</span>
+            <span className="hero__blueprint-mark hero__blueprint-mark--two" data-blueprint-line>WORKFLOW AXIS</span>
+          </div>
           <div className="hero__grid page-frame">
             <Reveal className="hero__content">
               <div className="eyebrow">Field note / 001</div>
@@ -222,9 +275,9 @@ export default function Home() {
                 <h2 className="section-heading" id="case-title">Reduced the <em>process</em>, not just the number.</h2>
                 <p className="body-copy">For my senior project, I applied DMAIC and Value Stream Mapping to the passenger check-in process at King AbdulAziz International Airport. The project focused on surfacing delay points, reducing unnecessary waiting, and simplifying manual verification steps.</p>
                 <div className="case-metrics" aria-label="Senior project outcomes">
-                  <div className="metric"><div className="metric__value">9.2 min</div><div className="metric__label">Average check-in time<br />from 15.5 min</div></div>
-                  <div className="metric"><div className="metric__value">−50%</div><div className="metric__label">Passenger waiting<br />time</div></div>
-                  <div className="metric"><div className="metric__value">−57%</div><div className="metric__label">Manual verification<br />time</div></div>
+                  <div className="metric"><div className="metric__value"><CountMetric target={9.2} decimals={1} suffix=" min" /></div><div className="metric__label">Average check-in time<br />from 15.5 min</div></div>
+                  <div className="metric"><div className="metric__value"><CountMetric target={50} prefix="−" suffix="%" /></div><div className="metric__label">Passenger waiting<br />time</div></div>
+                  <div className="metric"><div className="metric__value"><CountMetric target={57} prefix="−" suffix="%" /></div><div className="metric__label">Manual verification<br />time</div></div>
                 </div>
                 <div className="case-footnote">Senior academic project. Results describe the scoped study and proposed process-improvement outcomes, rather than an airport-wide production deployment.</div>
               </div>
